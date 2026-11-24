@@ -115,7 +115,8 @@ h3 { margin: 0 0 12px; font-size: 16px; }
 .board { display: grid; grid-template-columns: repeat(5, minmax(230px, 1fr)); gap: var(--space-4); align-items: start; overflow-x: auto; padding-bottom: var(--space-4); }
 .column { background: rgba(255,255,255,.55); border: 1px solid rgba(255,255,255,.9); border-radius: var(--radius); padding: var(--space-4); min-height: 380px; transition: background .12s, border-color .12s, box-shadow .12s; backdrop-filter: blur(6px); }
 .column.over { background: var(--accent-soft); border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255,75,37,.18); }
-.column-head { display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: .07em; margin: 0 var(--space-1) var(--space-3); gap: var(--space-2); color: var(--muted); }
+.column-head { display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: .07em; margin: 0 var(--space-1) var(--space-3); gap: var(--space-2); color: var(--muted); min-height: 32px; }
+.column-head .count { flex-shrink: 0; }
 .count { background: #fff; border-radius: 999px; padding: var(--space-1) var(--space-3); font-size: 12px; font-weight: 700; color: var(--text); box-shadow: 0 1px 2px rgba(20,20,30,.08); }
 .column-body { display: flex; flex-direction: column; gap: var(--space-3); }
 .card-ticket { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--space-4); cursor: grab; display: flex; flex-direction: column; gap: var(--space-3); box-shadow: 0 1px 2px rgba(20,20,30,.05); transition: box-shadow .12s, transform .12s; }
@@ -344,3 +345,11 @@ html[data-theme="dark"] .btn.primary:active:not(:disabled), html[data-theme="dar
 .ticket-count { padding-bottom: var(--space-3); }
 @media (max-width: 700px) { .ticket-count { padding-bottom: 0; } .table th:first-child, .table td:first-child { padding-left: var(--space-1); } .table th:last-child, .table td:last-child { padding-right: var(--space-1); } }
 
+
+/* WIP limit: the counter turns red when a column is full; a full column refuses drops */
+.count.full { background: var(--danger); color: #fff; }
+.count[title] { padding-left: var(--space-2); padding-right: var(--space-2); }
+.column.is-full.can-drop:not(.over) { border-color: var(--danger); }
+.column.is-full.over { background: #fff0ed; border-color: var(--danger); box-shadow: 0 0 0 3px rgba(229,72,52,.18); }
+html[data-theme="dark"] .count.full { background: var(--danger); color: #fff; }
+html[data-theme="dark"] .column.is-full.over { background: rgba(255,107,90,.12); border-color: var(--danger); box-shadow: 0 0 0 3px rgba(255,107,90,.25); }

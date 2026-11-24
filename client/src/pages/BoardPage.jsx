@@ -9,6 +9,11 @@ const EMPTY_FILTERS = { q: '', type: '', epic: '' };
 const savedFilters = {};
 let lastTeamId = ''; // the board also reopens on the team you used last, when the link has no ?team=
 
+// WIP limit: the working columns hold at most this many tickets (New and Done are not limited).
+// It is enforced on the board only: a drag into a full column is refused and the card stays where it was.
+const WIP_LIMIT = 10;
+const WIP_STATES = ['ready_for_implementation', 'in_progress', 'ready_for_acceptance'];
+
 const readTeamParam = () => new URLSearchParams(window.location.search).get('team') || lastTeamId;
 
 export default function BoardPage() {
@@ -80,12 +85,23 @@ export default function BoardPage() {
     return m;
   }, [visible]);
 
+  // the WIP counter counts all tickets of the team in a column, whatever the filters show
+  const totals = useMemo(() => {
+    const m = Object.fromEntries(STATES.map((st) => [st, 0]));
+    for (const t of tickets || []) m[t.state] += 1;
+    return m;
+  }, [tickets]);
+
   const filtersActive = filters.q || filters.type || filters.epic;
 
   // ---- drag and drop: optimistic move, persisted at once, rolled back on failure ----
   const move = async (id, state) => {
     const ticket = tickets.find((t) => t.id === id);
     if (!ticket || ticket.state === state) return;
+    if (WIP_STATES.includes(state) && totals[state] >= WIP_LIMIT) {
+      notify(`Board is full: "${STATE_LABEL[state]}" already has ${totals[state]} of ${WIP_LIMIT} tickets. "${ticket.title}" stays where it was.`, 'error');
+      return;
+    }
     const previous = tickets;
     setTickets(tickets.map((t) => (t.id === id ? { ...t, state } : t)));
     try {
@@ -177,7 +193,7 @@ export default function BoardPage() {
                     role="listitem"
                     aria-label={STATE_LABEL[state]}
                     data-state={state}
-                    className={`column ${overState === state ? 'over' : ''} ${dragId !== null ? 'can-drop' : ''}`}
+                    className={`column ${overState === state ? 'over' : ''} ${dragId !== null ? 'can-drop' : ''} ${WIP_STATES.includes(state) && totals[state] >= WIP_LIMIT ? 'is-full' : ''}`}
                     onDragOver={(e) => {
                       if (dragId === null) return;
                       e.preventDefault();
@@ -194,7 +210,13 @@ export default function BoardPage() {
                   >
                     <div className="column-head">
                       <span>{STATE_LABEL[state]}</span>
-                      <span className="count">{byState[state].length}</span>
+                      {WIP_STATES.includes(state) ? (
+                        <span className={`count ${totals[state] >= WIP_LIMIT ? 'full' : ''}`} title={`${totals[state]} of ${WIP_LIMIT} tickets (limit for this column)`}>
+                          {totals[state]}/{WIP_LIMIT}
+                        </span>
+                      ) : (
+                        <span className="count">{byState[state].length}</span>
+                      )}
                     </div>
                     <div className="column-body">
                       {byState[state].map((t) => (
