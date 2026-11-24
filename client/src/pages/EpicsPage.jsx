@@ -70,9 +70,8 @@ export default function EpicsPage() {
                         <button className="btn small" onClick={() => setForm({ epic: e })}>Edit</button>
                         <button
                           className="btn small"
-                          disabled={e.ticketCount > 0}
                           aria-label={`Delete epic ${e.title}`}
-                          title={e.ticketCount > 0 ? 'Delete is disabled while tickets reference the epic' : 'Delete epic'}
+                          title="Delete epic"
                           onClick={() => setToDelete(e)}
                         >
                           ✕
@@ -83,7 +82,7 @@ export default function EpicsPage() {
                 </tbody>
               </table>
             )}
-            <p className="muted small-text">Delete is disabled while tickets reference the epic.</p>
+            <p className="muted small-text">An epic that is still used by tickets cannot be deleted.</p>
           </div>
 
           {form && (

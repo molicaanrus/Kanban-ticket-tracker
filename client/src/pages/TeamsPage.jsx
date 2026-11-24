@@ -69,7 +69,6 @@ export default function TeamsPage() {
             </thead>
             <tbody>
               {teams.map((t) => {
-                const blocked = t.ticketCount > 0 || t.epicCount > 0;
                 return (
                   <tr key={t.id}>
                     <td><b>{t.name}</b></td>
@@ -80,8 +79,7 @@ export default function TeamsPage() {
                       <button className="btn small" onClick={() => setForm(t)}>Edit</button>
                       <button
                         className="btn small"
-                        disabled={blocked}
-                        title={blocked ? 'Delete is disabled while the team contains tickets or epics' : 'Delete team'}
+                        title="Delete team"
                         onClick={() => setToDelete(t)}
                       >
                         Delete
@@ -93,7 +91,7 @@ export default function TeamsPage() {
             </tbody>
           </table>
         )}
-        <p className="muted small-text">Delete is disabled while a team contains tickets or epics.</p>
+        <p className="muted small-text">A team that still contains tickets or epics cannot be deleted.</p>
       </div>
 
       {form && <TeamForm team={form.id ? form : null} onClose={() => setForm(null)} />}
