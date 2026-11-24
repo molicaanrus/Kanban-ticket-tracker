@@ -198,7 +198,7 @@ export default function BoardPage() {
                     </div>
                     <div className="column-body">
                       {byState[state].map((t) => (
-                        <Card key={t.id} t={t} dragging={dragId === t.id} onMove={(st) => move(t.id, st)}
+                        <Card key={t.id} t={t} dragging={dragId === t.id}
                           onDragStart={() => setDragId(t.id)}
                           onDragEnd={() => { setDragId(null); setOverState(null); }} />
                       ))}
@@ -215,7 +215,7 @@ export default function BoardPage() {
   );
 }
 
-function Card({ t, dragging, onMove, onDragStart, onDragEnd }) {
+function Card({ t, dragging, onDragStart, onDragEnd }) {
   return (
     <article
       className={`card-ticket ${dragging ? 'dragging' : ''}`}
@@ -228,13 +228,7 @@ function Card({ t, dragging, onMove, onDragStart, onDragEnd }) {
       }}
       onDragEnd={onDragEnd}
     >
-      <div className="card-top">
-        <TypeBadge type={t.type} />
-        <select className="move-select" value={t.state} aria-label={`Move "${t.title}" to another column`}
-          onChange={(e) => onMove(e.target.value)} draggable={false}>
-          {STATES.map((st) => <option key={st} value={st}>{st === t.state ? `Status: ${STATE_LABEL[st]}` : `Move to: ${STATE_LABEL[st]}`}</option>)}
-        </select>
-      </div>
+      <TypeBadge type={t.type} />
       <Link to={`/tickets/${t.id}?team=${t.teamId}`} className="card-title" draggable={false}>{t.title}</Link>
       <div className="card-foot">
         <span className="muted epic">{t.epicTitle ? `Epic: ${t.epicTitle}` : ''}</span>

@@ -171,7 +171,7 @@ h3 { margin: 0 0 12px; font-size: 16px; }
 .auth-theme { position: fixed; top: 16px; right: 20px; }
 
 /* Interaction states: hover / pressed / keyboard focus, shared by all controls */
-.btn, .navlink, .user-btn, .menu button, .link-btn, .move-select, .field input, .field select, .field textarea { transition: background .12s, border-color .12s, box-shadow .12s, color .12s, transform .06s; }
+.btn, .navlink, .user-btn, .menu button, .link-btn, .field input, .field select, .field textarea { transition: background .12s, border-color .12s, box-shadow .12s, color .12s, transform .06s; }
 .btn:hover:not(:disabled) { border-color: var(--text); }
 .btn:active:not(:disabled) { transform: translateY(1px) scale(.98); box-shadow: none; }
 .btn.primary:active:not(:disabled), .btn.dark:active:not(:disabled) { background: #000; }
@@ -186,8 +186,6 @@ h3 { margin: 0 0 12px; font-size: 16px; }
 .field input:hover:not(:focus):not(:disabled), .field select:hover:not(:focus):not(:disabled), .field textarea:hover:not(:focus) { border-color: var(--border-strong); }
 .table tbody tr:hover td { background: var(--panel-soft); }
 .card-ticket:active { cursor: grabbing; transform: scale(.985); box-shadow: 0 1px 2px rgba(20,20,30,.05); }
-.move-select:hover { border-color: var(--border-strong); color: var(--text); }
-.btn:focus-visible, .navlink:focus-visible, .user-btn:focus-visible, .menu button:focus-visible, .link-btn:focus-visible, a:focus-visible, .move-select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* ===== Dark theme: same layout, only colours change ===== */
 html[data-theme="dark"] {
@@ -238,7 +236,7 @@ html[data-theme="dark"] .toast { background: #2f3342; }
 html[data-theme="dark"] .auth-card { background: var(--panel); box-shadow: 0 24px 60px rgba(0,0,0,.5); }
 html[data-theme="dark"] .auth-card .btn.primary { box-shadow: 0 8px 20px rgba(124,92,255,.35); }
 
-/* Board comfort: keyboard/touch move control and drop hints */
+/* Board comfort: drop hints */
 .column-empty { border: 1.5px dashed var(--border-strong); border-radius: var(--radius-sm); padding: var(--space-4) var(--space-3); text-align: center; color: var(--muted); font-size: 12.5px; }
 .column.can-drop:not(.over) { border-style: dashed; border-color: var(--border-strong); }
 .card-ticket:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -346,8 +344,3 @@ html[data-theme="dark"] .btn.primary:active:not(:disabled), html[data-theme="dar
 .ticket-count { padding-bottom: var(--space-3); }
 @media (max-width: 700px) { .ticket-count { padding-bottom: 0; } .table th:first-child, .table td:first-child { padding-left: var(--space-1); } .table th:last-child, .table td:last-child { padding-right: var(--space-1); } }
 
-/* Card header row: type badge on the left, the move control on the right (never overlaps) */
-.card-top { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); min-height: 28px; }
-.move-select { max-width: 160px; min-width: 0; opacity: 0; pointer-events: none; border: 1px solid var(--border); background: var(--panel-soft); border-radius: 999px; padding: var(--space-1) var(--space-2); font-size: 11px; font-weight: 600; color: var(--muted); transition: opacity .12s, border-color .12s, color .12s; }
-.card-ticket:hover .move-select, .card-ticket:focus-within .move-select { opacity: 1; pointer-events: auto; }
-@media (hover: none) { .move-select { opacity: 1; pointer-events: auto; } }
