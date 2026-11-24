@@ -63,13 +63,13 @@ export default function EpicsPage() {
               </EmptyState>
             ) : (
               <table className="table">
-                <thead><tr><th>Title</th><th className="num">Tickets</th><th>Modified</th><th className="actions">Actions</th></tr></thead>
+                <thead><tr><th>Title</th><th className="num">Tickets</th><th className="hide-mobile">Modified</th><th className="actions">Actions</th></tr></thead>
                 <tbody>
                   {epics.map((e) => (
                     <tr key={e.id} className={form?.epic?.id === e.id ? 'selected' : ''}>
                       <td><b>{e.title}</b>{e.description && <div className="muted small-text clamp">{e.description}</div>}</td>
                       <td className="num">{e.ticketCount}</td>
-                      <td className="muted" title={e.modifiedAt}>{timeAgo(e.modifiedAt)}</td>
+                      <td className="muted hide-mobile" title={e.modifiedAt}>{timeAgo(e.modifiedAt)}</td>
                       <td className="actions">
                         <button className="btn small" onClick={() => setForm({ epic: e })}>Edit</button>
                         <button

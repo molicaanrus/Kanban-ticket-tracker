@@ -278,3 +278,70 @@ html[data-theme="dark"] .card-ticket:active { box-shadow: 0 1px 2px rgba(0,0,0,.
 
 /* Logo: two chevrons ">>" on the accent tile */
 .brand::before, .brand-big::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cg fill='none' stroke='%23fff' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 9l7 7-7 7'/%3E%3Cpath d='M16.5 9l7 7-7 7'/%3E%3C/g%3E%3C/svg%3E"); background-size: 100% 100%; background-repeat: no-repeat; flex-shrink: 0; }
+
+/* ===== Mobile (phones) ===== */
+.btn { white-space: nowrap; }
+@media (hover: none) {
+  /* touch: the "Move to" control sits in the card instead of overlaying it */
+  .move-select { position: static; opacity: 1; pointer-events: auto; max-width: none; width: 100%; padding: var(--space-2) var(--space-3); font-size: 13px; }
+}
+@media (max-width: 700px) {
+  .topbar { display: grid; grid-template-columns: 1fr auto; gap: var(--space-3); padding: var(--space-3) var(--space-4); }
+  .topbar nav { grid-column: 1 / -1; grid-row: 2; margin-left: 0; width: 100%; }
+  .topbar nav .navlink { flex: 1; text-align: center; }
+  .topbar .user-menu { grid-column: 2; grid-row: 1; }
+  .user-btn { max-width: 168px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: var(--space-2) var(--space-3); }
+  .menu { right: 0; }
+  .brand { font-size: 17px; }
+
+  .page, .page.wide { padding: var(--space-2) var(--space-4) var(--space-6); }
+  .page-head { flex-wrap: wrap; }
+  h2 { font-size: 22px; }
+  .ticket-title { font-size: 24px; }
+  .ticket-head { flex-wrap: wrap; align-items: flex-start; }
+
+  .board-head { gap: var(--space-3); }
+  .board-head .field.inline { flex: 1; min-width: 0; }
+  .board-head .field select { min-width: 0; }
+
+  .filters { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); padding: var(--space-4); }
+  .filters .field { min-width: 0; }
+  .filters .field:first-child { grid-column: 1 / -1; }
+  .filters .btn { justify-self: start; }
+  .ticket-count { margin-left: 0; text-align: right; align-self: center; }
+
+  /* board: swipe between columns, the next one peeks in */
+  .board { display: flex; gap: var(--space-3); margin: 0 calc(var(--space-4) * -1); padding: 0 var(--space-4) var(--space-4); scroll-snap-type: x mandatory; scroll-padding: 0 var(--space-4); -webkit-overflow-scrolling: touch; }
+  .column { flex: 0 0 82%; scroll-snap-align: start; min-height: 320px; }
+
+  .card { padding: var(--space-4); }
+  .table { display: block; overflow-x: auto; white-space: nowrap; }
+  .table td, .table th { padding-left: var(--space-3); padding-right: var(--space-3); }
+  .modal { width: calc(100vw - var(--space-5)); padding: var(--space-4); }
+  .modal-backdrop { padding-top: 6vh; }
+  .auth-page { padding: var(--space-6) var(--space-4); }
+  .auth-card { padding: var(--space-5); }
+  .toast { max-width: calc(100vw - var(--space-5)); text-align: center; }
+}
+.brand { white-space: nowrap; }
+@media (max-width: 700px) { .hide-mobile { display: none; } .table { white-space: normal; } .table .actions { white-space: nowrap; } }
+@media (max-width: 700px) {
+  .topbar { grid-template-columns: minmax(0, 1fr) auto; }
+  .brand { overflow: hidden; }
+  .table { display: table; overflow: visible; }
+  .table .num { width: auto; }
+  .table th { font-size: 10px; letter-spacing: .04em; }
+  .table td, .table th { padding: var(--space-3) var(--space-1); }
+  .table td.actions .btn { margin-left: var(--space-1); }
+}
+@media (max-width: 700px) {
+  .brand { font-size: 15px; gap: var(--space-2); overflow: visible; }
+  .brand::before { width: 24px; height: 24px; }
+  .user-btn { max-width: 150px; }
+}
+/* dark theme: coloured buttons keep their fill on hover */
+html[data-theme="dark"] .btn.accent:hover:not(:disabled), html[data-theme="dark"] .btn.new-ticket:hover:not(:disabled), html[data-theme="dark"] .auth-card .btn.primary:hover:not(:disabled) { background: var(--accent-dark); border-color: var(--accent-dark); }
+html[data-theme="dark"] .btn.primary:hover:not(:disabled), html[data-theme="dark"] .btn.dark:hover:not(:disabled) { background: #3a3f52; border-color: var(--muted); }
+html[data-theme="dark"] .btn.danger-solid:hover:not(:disabled) { background: var(--danger); }
+html[data-theme="dark"] .btn.accent:active:not(:disabled), html[data-theme="dark"] .btn.new-ticket:active:not(:disabled), html[data-theme="dark"] .auth-card .btn.primary:active:not(:disabled) { background: #5a3ad8; border-color: #5a3ad8; }
+html[data-theme="dark"] .btn.primary:active:not(:disabled), html[data-theme="dark"] .btn.dark:active:not(:disabled) { background: #444a5f; }

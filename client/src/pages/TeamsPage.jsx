@@ -67,7 +67,7 @@ export default function TeamsPage() {
         ) : (
           <table className="table">
             <thead>
-              <tr><th>Name</th><th className="num">Tickets</th><th className="num">Epics</th><th>Modified</th><th className="actions">Actions</th></tr>
+              <tr><th>Name</th><th className="num">Tickets</th><th className="num">Epics</th><th className="hide-mobile">Modified</th><th className="actions">Actions</th></tr>
             </thead>
             <tbody>
               {teams.map((t) => {
@@ -76,7 +76,7 @@ export default function TeamsPage() {
                     <td><b>{t.name}</b></td>
                     <td className="num">{t.ticketCount}</td>
                     <td className="num">{t.epicCount}</td>
-                    <td className="muted" title={t.modifiedAt}>{timeAgo(t.modifiedAt)}</td>
+                    <td className="muted hide-mobile" title={t.modifiedAt}>{timeAgo(t.modifiedAt)}</td>
                     <td className="actions">
                       <button className="btn small" onClick={() => setForm(t)}>Edit</button>
                       <button
