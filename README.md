@@ -6,7 +6,7 @@ A small Kanban-style ticket tracker: React single-page app, Node.js (Express) HT
 
 Docker with Docker Compose v2 (Docker Desktop on Windows/macOS, Docker Engine + Compose plugin on Linux). Nothing else is needed on the host: no Node.js, no PostgreSQL.
 
-No Docker on your machine? Open this repository in **GitHub Codespaces** (Code → Codespaces → Create codespace). The bundled `.devcontainer` provides Docker; run the commands below in its terminal and open the forwarded ports from the **Ports** tab.
+No Docker on your machine? Open this repository in **GitHub Codespaces** (Code → Codespaces → Create codespace). The default Codespaces image already includes Docker; run the commands below in its terminal and open the forwarded ports from the **Ports** tab.
 
 ## Start
 
