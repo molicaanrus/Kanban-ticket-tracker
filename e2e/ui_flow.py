@@ -79,7 +79,6 @@ async def main():
         await pg.click('a.back'); await pg.click('a.navlink:has-text("Teams")'); await pg.wait_for_selector('td:has-text("Payments Team")')
         await pg.click('tr:has-text("Payments Team") button:has-text("Delete")'); await pg.click('.modal button:has-text("Delete")')
         await pg.wait_for_selector('.toast.error'); print('team delete blocked with message: OK')
-        await pg.click('.modal button:has-text("Cancel")')
         await pg.screenshot(path='e2e/shots/t07-teams.png')
         await pg.click('a.navlink:has-text("Epics")'); await pg.select_option('select', label='Payments Team'); await pg.wait_for_selector('td:has-text("Checkout")')
         await pg.click('tr:has-text("Checkout") button[aria-label^="Delete epic"]'); await pg.click('.modal button:has-text("Delete")')
