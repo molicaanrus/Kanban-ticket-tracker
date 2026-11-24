@@ -407,3 +407,10 @@ html[data-theme="dark"] .theme-switch.is-dark .ts-moon { color: #fff; }
 /* The "no tickets yet" hint is information, not an error: neutral colours */
 .hint-banner { background: rgba(255,255,255,.7); border: 1px solid var(--border); color: var(--muted); }
 html[data-theme="dark"] .hint-banner { background: var(--panel-soft); border-color: var(--border); color: var(--muted); }
+
+/* Assignee: avatar on the card, two-column row in the ticket form */
+.card-top { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); min-height: 26px; } /* same height with or without an avatar */
+.avatar { flex: 0 0 auto; width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent-dark); font-size: 10px; font-weight: 800; letter-spacing: .02em; cursor: default; }
+html[data-theme="dark"] .avatar { color: var(--text); }
+.grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-4); }
+@media (max-width: 700px) { .grid2 { grid-template-columns: 1fr; } }

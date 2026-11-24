@@ -3,7 +3,7 @@ import { api, STATES, STATE_LABEL, TYPES, TYPE_LABEL, formatUtc } from '../api.j
 import { Link, navigate, useApp } from '../app-state.jsx';
 import { Confirm } from '../components/ui.jsx';
 
-const EMPTY = { teamId: '', type: 'feature', state: 'new', epicId: '', title: '', body: '' };
+const EMPTY = { teamId: '', type: 'feature', state: 'new', epicId: '', assigneeId: '', title: '', body: '' };
 
 export default function TicketPage({ idParam, search }) {
   const { teams, loadTeams, notify } = useApp();
@@ -11,6 +11,7 @@ export default function TicketPage({ idParam, search }) {
   const [ticket, setTicket] = useState(null); // saved ticket (null for new)
   const [form, setForm] = useState(EMPTY);
   const [epics, setEpics] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(!isNew);
   const [notFound, setNotFound] = useState(false);
   const [errors, setErrors] = useState({});
@@ -21,7 +22,7 @@ export default function TicketPage({ idParam, search }) {
   const backTeam = ticket?.teamId || form.teamId || new URLSearchParams(search).get('team') || '';
   const backTeamName = teams?.find((t) => String(t.id) === String(backTeam))?.name;
 
-  const fromTicket = (t) => ({ teamId: String(t.teamId), type: t.type, state: t.state, epicId: t.epicId ? String(t.epicId) : '', title: t.title, body: t.body });
+  const fromTicket = (t) => ({ teamId: String(t.teamId), type: t.type, state: t.state, epicId: t.epicId ? String(t.epicId) : '', assigneeId: t.assignee ? String(t.assignee.id) : '', title: t.title, body: t.body });
 
   // load the ticket, or prepare an empty form for a new one
   useEffect(() => {
@@ -59,6 +60,11 @@ export default function TicketPage({ idParam, search }) {
     return () => { cancelled = true; };
   }, [form.teamId]);
 
+  // people a ticket can be assigned to
+  useEffect(() => {
+    api.get('/users').then((d) => setUsers(d.users)).catch(() => setUsers([]));
+  }, []);
+
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
   // Changing the team clears the epic, because epics belong to exactly one team
@@ -78,7 +84,7 @@ export default function TicketPage({ idParam, search }) {
     setFormError('');
     if (!validate()) return;
     setSaving(true);
-    const payload = { ...form, teamId: Number(form.teamId), epicId: form.epicId ? Number(form.epicId) : null };
+    const payload = { ...form, teamId: Number(form.teamId), epicId: form.epicId ? Number(form.epicId) : null, assigneeId: form.assigneeId ? Number(form.assigneeId) : null };
     try {
       if (isNew) {
         const d = await api.post('/tickets', payload);
@@ -169,13 +175,22 @@ export default function TicketPage({ idParam, search }) {
               </select>
             </label>
           </div>
-          <label className="field">
-            <span>Epic</span>
-            <select value={form.epicId} onChange={set('epicId')}>
-              <option value="">No epic</option>
-              {epics.map((e) => <option key={e.id} value={e.id}>{e.title}</option>)}
-            </select>
-          </label>
+          <div className="grid2">
+            <label className="field">
+              <span>Epic</span>
+              <select value={form.epicId} onChange={set('epicId')}>
+                <option value="">No epic</option>
+                {epics.map((e) => <option key={e.id} value={e.id}>{e.title}</option>)}
+              </select>
+            </label>
+            <label className="field">
+              <span>Assignee</span>
+              <select value={form.assigneeId} onChange={set('assigneeId')}>
+                <option value="">Unassigned</option>
+                {users.map((u) => <option key={u.id} value={u.id}>{u.email}</option>)}
+              </select>
+            </label>
+          </div>
           <label className="field">
             <span>Title</span>
             <input value={form.title} onChange={set('title')} aria-invalid={!!errors.title} placeholder="Short summary" />

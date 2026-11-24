@@ -4,12 +4,13 @@ import { ah, fail, parseId, requireText, requireEnum, TYPES, STATES } from '../u
 
 const r = Router();
 
-const SELECT = `SELECT k.*, t.name AS team_name, e.title AS epic_title, u.email AS created_by_email,
+const SELECT = `SELECT k.*, t.name AS team_name, e.title AS epic_title, u.email AS created_by_email, a.email AS assignee_email,
        (SELECT count(*) FROM comments c WHERE c.ticket_id = k.id)::int AS comment_count
   FROM tickets k
   JOIN teams t ON t.id = k.team_id
   LEFT JOIN epics e ON e.id = k.epic_id
-  JOIN users u ON u.id = k.created_by`;
+  JOIN users u ON u.id = k.created_by
+  LEFT JOIN users a ON a.id = k.assignee_id`;
 
 export const ticketDto = (k) => ({
   id: k.id,
@@ -25,6 +26,7 @@ export const ticketDto = (k) => ({
   createdAt: k.created_at,
   modifiedAt: k.modified_at,
   createdBy: { id: k.created_by, email: k.created_by_email },
+  assignee: k.assignee_id === null ? null : { id: k.assignee_id, email: k.assignee_email },
   commentCount: k.comment_count,
 });
 
@@ -46,10 +48,19 @@ async function assertEpicInTeam(epicId, teamId) {
   if (epic.team_id !== teamId) fail(400, 'The selected epic belongs to a different team', 'EPIC_TEAM_MISMATCH');
 }
 
+// The assignee is null (unassigned) or a verified user
+async function assertAssignee(assigneeId) {
+  if (assigneeId === null) return;
+  const u = await one('SELECT email_verified_at FROM users WHERE id = $1', [assigneeId]);
+  if (!u || !u.email_verified_at) fail(400, 'The selected assignee does not exist', 'VALIDATION_ERROR');
+}
+
+const parseAssignee = (v) => (v === null || v === '' || v === undefined ? null : parseId(v, 'assignee'));
+
 const parseEpic = (v) => (v === null || v === '' || v === undefined ? null : parseId(v, 'epic'));
 
 // Board data: all tickets of one team, most recently modified first.
-// Optional server-side filters: type, epicId (or "none"), q (case-insensitive title substring).
+// Optional server-side filters: type, epicId (or "none"), assigneeId (or "none"), q (case-insensitive title substring).
 r.get('/', ah(async (req, res) => {
   const teamId = parseId(req.query.teamId, 'team id');
   const where = ['k.team_id = $1'];
@@ -62,6 +73,11 @@ r.get('/', ah(async (req, res) => {
   else if (req.query.epicId) {
     params.push(parseId(req.query.epicId, 'epic id'));
     where.push(`k.epic_id = $${params.length}`);
+  }
+  if (req.query.assigneeId === 'none') where.push('k.assignee_id IS NULL');
+  else if (req.query.assigneeId) {
+    params.push(parseId(req.query.assigneeId, 'assignee id'));
+    where.push(`k.assignee_id = $${params.length}`);
   }
   if (req.query.q) {
     params.push(`%${String(req.query.q).replace(/[\\%_]/g, '\\$&')}%`);
@@ -82,12 +98,14 @@ r.post('/', ah(async (req, res) => {
   const state = req.body.state === undefined ? 'new' : requireEnum(req.body.state, STATES, 'State');
   const epicId = parseEpic(req.body.epicId);
   await assertEpicInTeam(epicId, teamId);
+  const assigneeId = parseAssignee(req.body.assigneeId);
+  await assertAssignee(assigneeId);
   const title = requireText(req.body.title, 'Title').trim();
   const body = requireText(req.body.body, 'Body');
   const { id } = await one(
-    `INSERT INTO tickets (team_id, type, state, epic_id, title, body, created_by)
-     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
-    [teamId, type, state, epicId, title, body, req.user.id]
+    `INSERT INTO tickets (team_id, type, state, epic_id, assignee_id, title, body, created_by)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
+    [teamId, type, state, epicId, assigneeId, title, body, req.user.id]
   );
   res.status(201).json({ ticket: ticketDto(await getTicket(id)) });
 }));
@@ -102,18 +120,20 @@ r.patch('/:id', ah(async (req, res) => {
     type: b.type !== undefined ? requireEnum(b.type, TYPES, 'Type') : cur.type,
     state: b.state !== undefined ? requireEnum(b.state, STATES, 'State') : cur.state,
     epic_id: b.epicId !== undefined ? parseEpic(b.epicId) : cur.epic_id,
+    assignee_id: b.assigneeId !== undefined ? parseAssignee(b.assigneeId) : cur.assignee_id,
     title: b.title !== undefined ? requireText(b.title, 'Title').trim() : cur.title,
     body: b.body !== undefined ? requireText(b.body, 'Body') : cur.body,
   };
   if (next.team_id !== cur.team_id) await assertTeam(next.team_id);
   await assertEpicInTeam(next.epic_id, next.team_id);
+  if (next.assignee_id !== cur.assignee_id) await assertAssignee(next.assignee_id);
 
   const changed = Object.keys(next).some((k) => next[k] !== cur[k]);
   if (changed) {
     await q(
-      `UPDATE tickets SET team_id = $1, type = $2, state = $3, epic_id = $4, title = $5, body = $6, modified_at = now()
-        WHERE id = $7`,
-      [next.team_id, next.type, next.state, next.epic_id, next.title, next.body, id]
+      `UPDATE tickets SET team_id = $1, type = $2, state = $3, epic_id = $4, assignee_id = $5, title = $6, body = $7, modified_at = now()
+        WHERE id = $8`,
+      [next.team_id, next.type, next.state, next.epic_id, next.assignee_id, next.title, next.body, id]
     );
   }
   res.json({ ticket: ticketDto(await getTicket(id)), changed });

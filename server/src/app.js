@@ -7,6 +7,7 @@ import authRoutes from './routes/auth.js';
 import teamRoutes from './routes/teams.js';
 import epicRoutes from './routes/epics.js';
 import ticketRoutes from './routes/tickets.js';
+import userRoutes from './routes/users.js';
 
 export function createApp({ staticDir } = {}) {
   const app = express();
@@ -23,6 +24,7 @@ export function createApp({ staticDir } = {}) {
   app.use('/api/teams', requireAuth, teamRoutes);
   app.use('/api/epics', requireAuth, epicRoutes);
   app.use('/api/tickets', requireAuth, ticketRoutes);
+  app.use('/api/users', requireAuth, userRoutes);
   app.use('/api', (req, res) => res.status(404).json({ error: 'Not found', code: 'NOT_FOUND' }));
 
   // Presentation tier: the compiled SPA (static files are public)

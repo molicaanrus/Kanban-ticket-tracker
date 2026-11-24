@@ -58,7 +58,7 @@ then run `docker compose up --build` again. The relay is reachable only from the
 docker compose --profile test run --rm tests
 ```
 
-The tests run against a real PostgreSQL database (`tracker_test`, created automatically) and cover: sign-up → email verification → login; token expiry (24 h), single use and invalidation by resend; authentication required on business endpoints; team/epic/ticket rules (409 on non-empty team and used epic, epic must belong to the ticket's team); `modified_at` changes only on real changes; comments; board ordering and filters; empty database after migrations.
+The tests run against a real PostgreSQL database (`tracker_test`, created automatically) and cover: sign-up → email verification → login; token expiry (24 h), single use and invalidation by resend; authentication required on business endpoints; team/epic/ticket rules (409 on non-empty team and used epic, epic must belong to the ticket's team); the optional ticket assignee (verified users only, counts as a modification, filter); `modified_at` changes only on real changes; comments; board ordering and filters; empty database after migrations.
 
 ## Architecture
 
@@ -79,7 +79,8 @@ Browser (React SPA)  →  Node.js API (Express)  →  PostgreSQL 16
 | GET | `/api/auth/me` | current user |
 | GET/POST/PATCH/DELETE | `/api/teams[/:id]` | 409 when team has tickets or epics |
 | GET/POST/PATCH/DELETE | `/api/epics[/:id]` | 409 when tickets use the epic |
-| GET/POST/PATCH/DELETE | `/api/tickets[/:id]` | list needs `teamId`; filters `type`, `epicId`, `q` |
+| GET/POST/PATCH/DELETE | `/api/tickets[/:id]` | list needs `teamId`; filters `type`, `epicId`, `assigneeId` (id or `none`), `q`; optional `assigneeId` on create/update |
+| GET | `/api/users` | verified users (`id`, `email`) a ticket can be assigned to |
 | GET/POST | `/api/tickets/:id/comments` | oldest first |
 
 ## AI usage
