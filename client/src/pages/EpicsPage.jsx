@@ -69,10 +69,12 @@ export default function EpicsPage() {
                       <td className="actions">
                         <button className="btn small" onClick={() => setForm({ epic: e })}>Edit</button>
                         <button
-                          className="btn small"
+                          className={`btn small${e.ticketCount > 0 ? ' looks-disabled' : ''}`}
                           aria-label={`Delete epic ${e.title}`}
-                          title="Delete epic"
-                          onClick={() => setToDelete(e)}
+                          title={e.ticketCount > 0 ? 'Cannot be deleted: tickets still use this epic' : 'Delete epic'}
+                          onClick={() => (e.ticketCount > 0
+                            ? notify(`Cannot delete "${e.title}": tickets still use this epic.`, 'error')
+                            : setToDelete(e))}
                         >
                           ✕
                         </button>

@@ -78,9 +78,11 @@ export default function TeamsPage() {
                     <td className="actions">
                       <button className="btn small" onClick={() => setForm(t)}>Edit</button>
                       <button
-                        className="btn small"
-                        title="Delete team"
-                        onClick={() => setToDelete(t)}
+                        className={`btn small${t.ticketCount + t.epicCount > 0 ? ' looks-disabled' : ''}`}
+                        title={t.ticketCount + t.epicCount > 0 ? 'Cannot be deleted: the team still contains tickets or epics' : 'Delete team'}
+                        onClick={() => (t.ticketCount + t.epicCount > 0
+                          ? notify(`Cannot delete "${t.name}": it still contains tickets or epics.`, 'error')
+                          : setToDelete(t))}
                       >
                         Delete
                       </button>
