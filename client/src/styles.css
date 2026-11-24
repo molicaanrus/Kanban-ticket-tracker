@@ -369,3 +369,15 @@ html[data-theme="dark"] .field select {
 /* A column with tickets is a little lighter than an empty one */
 .column.filled:not(.over) { background: rgba(255,255,255,.88); }
 html[data-theme="dark"] .column.filled:not(.over) { background: rgba(255,255,255,.075); }
+
+/* Limit per column: sits next to the team select */
+.board-head-left { display: flex; align-items: flex-end; gap: var(--space-4); }
+.board-head .field.limit-field { min-width: 0; width: 160px; }
+.board-head .field.limit-field input { font-weight: 600; background-color: #fff; -moz-appearance: textfield; appearance: textfield; }
+.board-head .field.limit-field input::-webkit-outer-spin-button, .board-head .field.limit-field input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.board-head .field.limit-field input[aria-invalid="true"] { border-color: var(--danger); }
+html[data-theme="dark"] .board-head .field.limit-field input { background-color: var(--panel-soft); }
+@media (max-width: 700px) {
+  .board-head-left { flex: 1; min-width: 0; }
+  .board-head .field.limit-field { width: 120px; flex: 0 0 120px; }
+}

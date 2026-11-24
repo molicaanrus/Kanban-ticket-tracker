@@ -11,7 +11,18 @@ let lastTeamId = ''; // the board also reopens on the team you used last, when t
 
 // WIP limit: the working columns hold at most this many tickets (only Done is not limited).
 // It is enforced on the board only: a drag into a full column is refused and the card stays where it was.
-const WIP_LIMIT = 2;
+const DEFAULT_WIP_LIMIT = 2;
+const MAX_WIP_LIMIT = 999;
+// The limit is one number for all columns, set per team and kept in this browser.
+const limitKey = (teamId) => `tt.wip.${teamId}`;
+const readLimit = (teamId) => {
+  try {
+    const n = Number(window.localStorage.getItem(limitKey(teamId)));
+    if (Number.isInteger(n) && n >= 1 && n <= MAX_WIP_LIMIT) return n;
+  } catch { /* storage unavailable: use the default */ }
+  return DEFAULT_WIP_LIMIT;
+};
+const validLimit = (text) => /^\d{1,3}$/.test(text.trim()) && Number(text) >= 1 && Number(text) <= MAX_WIP_LIMIT;
 const WIP_STATES = ['new', 'ready_for_implementation', 'in_progress', 'ready_for_acceptance'];
 
 const readTeamParam = () => new URLSearchParams(window.location.search).get('team') || lastTeamId;
@@ -25,6 +36,8 @@ export default function BoardPage() {
   const [dragId, setDragId] = useState(null);
   const [overState, setOverState] = useState(null);
   const [loadError, setLoadError] = useState('');
+  const [limit, setLimit] = useState(() => readLimit(readTeamParam()));
+  const [limitText, setLimitText] = useState(() => String(readLimit(readTeamParam())));
 
   // pick a valid team: the one in the URL, otherwise the first
   useEffect(() => {
@@ -67,6 +80,21 @@ export default function BoardPage() {
     window.history.replaceState({}, '', `/?team=${id}`);
   };
 
+  // each team has its own limit: load it whenever the team changes (also when the first team is picked automatically)
+  useEffect(() => {
+    const l = readLimit(teamId);
+    setLimit(l);
+    setLimitText(String(l));
+  }, [teamId]);
+
+  const changeLimit = (text) => {
+    setLimitText(text);
+    if (!validLimit(text)) return; // wait until the number is valid; the board keeps the last good limit
+    const n = Number(text);
+    setLimit(n);
+    try { window.localStorage.setItem(limitKey(teamId), String(n)); } catch { /* ignore */ }
+  };
+
   // Filters are combined with AND and applied client-side
   const visible = useMemo(() => {
     if (!tickets) return [];
@@ -98,8 +126,8 @@ export default function BoardPage() {
   const move = async (id, state) => {
     const ticket = tickets.find((t) => t.id === id);
     if (!ticket || ticket.state === state) return;
-    if (WIP_STATES.includes(state) && totals[state] >= WIP_LIMIT) {
-      notify(`Board is full: "${STATE_LABEL[state]}" already has ${totals[state]} of ${WIP_LIMIT} tickets. "${ticket.title}" stays where it was.`, 'error');
+    if (WIP_STATES.includes(state) && totals[state] >= limit) {
+      notify(`Board is full: "${STATE_LABEL[state]}" already has ${totals[state]} of ${limit} tickets. "${ticket.title}" stays where it was.`, 'error');
       return;
     }
     const previous = tickets;
@@ -126,12 +154,24 @@ export default function BoardPage() {
   return (
     <div className="page wide">
       <div className="board-head">
+        <div className="board-head-left">
         <label className="field inline">
           <span>Team</span>
           <select value={teamId} onChange={(e) => changeTeam(e.target.value)} disabled={!teams?.length} aria-label="Team">
             {teams?.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
           </select>
         </label>
+        <label className="field inline limit-field">
+          <span>Limit per column</span>
+          <input
+            type="number" inputMode="numeric" min="1" max={MAX_WIP_LIMIT} step="1"
+            value={limitText} aria-label="Ticket limit per column" aria-invalid={!validLimit(limitText)}
+            disabled={!teamId}
+            onChange={(e) => changeLimit(e.target.value)}
+            onBlur={() => setLimitText(String(limit))}
+          />
+        </label>
+        </div>
         <button className="btn accent" disabled={!teamId} onClick={() => navigate(`/tickets/new?team=${teamId}`)}>+ New ticket</button>
       </div>
 
@@ -193,7 +233,7 @@ export default function BoardPage() {
                     role="listitem"
                     aria-label={STATE_LABEL[state]}
                     data-state={state}
-                    className={`column ${overState === state ? 'over' : ''} ${byState[state].length > 0 ? 'filled' : ''} ${dragId !== null ? 'can-drop' : ''} ${WIP_STATES.includes(state) && totals[state] >= WIP_LIMIT ? 'is-full' : ''}`}
+                    className={`column ${overState === state ? 'over' : ''} ${byState[state].length > 0 ? 'filled' : ''} ${dragId !== null ? 'can-drop' : ''} ${WIP_STATES.includes(state) && totals[state] >= limit ? 'is-full' : ''}`}
                     onDragOver={(e) => {
                       if (dragId === null) return;
                       e.preventDefault();
@@ -211,8 +251,8 @@ export default function BoardPage() {
                     <div className="column-head">
                       <span>{STATE_LABEL[state]}</span>
                       {WIP_STATES.includes(state) ? (
-                        <span className={`count ${totals[state] >= WIP_LIMIT ? 'full' : ''}`} title={`${totals[state]} of ${WIP_LIMIT} tickets (limit for this column)`}>
-                          {totals[state]}/{WIP_LIMIT}
+                        <span className={`count ${totals[state] >= limit ? 'full' : ''}`} title={`${totals[state]} of ${limit} tickets (limit for this column)`}>
+                          {totals[state]}/{limit}
                         </span>
                       ) : (
                         <span className="count">{byState[state].length}</span>
