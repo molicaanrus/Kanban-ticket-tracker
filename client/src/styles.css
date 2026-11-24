@@ -357,7 +357,7 @@ html[data-theme="dark"] .column.is-full.over { background: rgba(255,107,90,.12);
 /* Select arrow: one thin chevron that follows the theme, same distance from the edge in every select */
 .field select {
   appearance: none; -webkit-appearance: none;
-  padding-right: 44px;
+  padding-right: var(--space-7);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none' stroke='%2371747d' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1.5 1.75 6 6.25l4.5-4.5'/%3E%3C/svg%3E");
   background-repeat: no-repeat; background-position: right 18px center; background-size: 12px 8px;
 }
@@ -414,3 +414,7 @@ html[data-theme="dark"] .hint-banner { background: var(--panel-soft); border-col
 html[data-theme="dark"] .avatar { color: var(--text); }
 .grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-4); }
 @media (max-width: 700px) { .grid2 { grid-template-columns: 1fr; } }
+
+/* Card: type badge and ticket key on the left */
+.card-tags { display: flex; align-items: center; gap: var(--space-2); min-width: 0; }
+.card-key { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .02em; }

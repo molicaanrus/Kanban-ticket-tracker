@@ -38,6 +38,12 @@ All settings are environment variables with working defaults. To override them c
 | `APP_BASE_URL` | empty (taken from the browser address) | Public URL used in verification links |
 | `POSTGRES_PASSWORD` | empty | Password of the local database container. Empty means a random password is generated at first start and kept in the `secrets` Docker volume (nothing secret is committed). Upgrading from an older checkout? Run `docker compose down -v` once, so the database and its password are created together. |
 | `COOKIE_SECURE` | `false` | Set `true` when served over HTTPS |
+| `SMTP_TLS_REJECT_UNAUTHORIZED` | `true` | Set `false` only for a relay with a self-signed certificate |
+| `PORT` | `3000` | Port of the Node server inside the container (Compose publishes it as 8080) |
+| `DATABASE_URL` | set by Compose | PostgreSQL connection string, without the password |
+| `DB_PASSWORD_FILE` | set by Compose | File with the database password (generated at first start) |
+| `STATIC_DIR` | `../client/dist` | Folder with the compiled web app |
+| `MAIL_TRANSPORT` | empty | `memory` keeps e-mails in memory instead of sending them (used by the automated tests) |
 
 ### Using the DataArt SMTP relay
 

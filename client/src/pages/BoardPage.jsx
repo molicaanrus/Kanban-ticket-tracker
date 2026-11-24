@@ -28,7 +28,7 @@ const WIP_STATES = ['new', 'ready_for_implementation', 'in_progress', 'ready_for
 const readTeamParam = () => new URLSearchParams(window.location.search).get('team') || lastTeamId;
 
 export default function BoardPage() {
-  const { teams, notify } = useApp();
+  const { teams, notify, user } = useApp();
   const [teamId, setTeamId] = useState(readTeamParam);
   const [tickets, setTickets] = useState(null); // null = loading
   const [epics, setEpics] = useState([]);
@@ -214,6 +214,11 @@ export default function BoardPage() {
                 {users.map((u) => <option key={u.id} value={u.id}>{u.email}</option>)}
               </select>
             </label>
+            <button
+              type="button" className={`btn ${filters.assignee === String(user.id) ? 'dark' : ''}`}
+              aria-pressed={filters.assignee === String(user.id)}
+              onClick={() => setFilters({ ...filters, assignee: filters.assignee === String(user.id) ? '' : String(user.id) })}
+            >My tickets</button>
             <button className="btn" disabled={!filtersActive} onClick={() => setFilters(EMPTY_FILTERS)}>Clear</button>
             <div className="ticket-count" aria-live="polite">
               {tickets === null ? '' : filtersActive ? `${visible.length} of ${tickets.length} tickets` : `${tickets.length} tickets`}
@@ -305,7 +310,10 @@ function Card({ t, dragging, onDragStart, onDragEnd }) {
       onDragEnd={onDragEnd}
     >
       <div className="card-top">
-        <TypeBadge type={t.type} />
+        <div className="card-tags">
+          <TypeBadge type={t.type} />
+          <span className="card-key">{t.key}</span>
+        </div>
         {t.assignee && <span className="avatar" title={`Assignee: ${t.assignee.email}`} aria-label={`Assignee: ${t.assignee.email}`}>{initials(t.assignee.email)}</span>}
       </div>
       <Link to={`/tickets/${t.id}?team=${t.teamId}`} className="card-title" draggable={false}>{t.title}</Link>
