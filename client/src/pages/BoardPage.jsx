@@ -11,7 +11,7 @@ let lastTeamId = ''; // the board also reopens on the team you used last, when t
 
 // WIP limit: the working columns hold at most this many tickets (New and Done are not limited).
 // It is enforced on the board only: a drag into a full column is refused and the card stays where it was.
-const WIP_LIMIT = 10;
+const WIP_LIMIT = 2;
 const WIP_STATES = ['ready_for_implementation', 'in_progress', 'ready_for_acceptance'];
 
 const readTeamParam = () => new URLSearchParams(window.location.search).get('team') || lastTeamId;
