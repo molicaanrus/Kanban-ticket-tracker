@@ -1,6 +1,6 @@
 // Shared test setup: runs the real app against a dedicated test database and captures emails in memory.
 process.env.MAIL_TRANSPORT = 'memory';
-process.env.DATABASE_URL = process.env.TEST_DATABASE_URL || 'postgres://tracker:tracker@localhost:5432/tracker_test';
+process.env.DATABASE_URL = process.env.TEST_DATABASE_URL || 'postgres://tracker@localhost:5432/tracker_test';
 
 // Create the test database if it does not exist yet (e.g. first run inside docker compose)
 {
@@ -8,7 +8,8 @@ process.env.DATABASE_URL = process.env.TEST_DATABASE_URL || 'postgres://tracker:
   const url = new URL(process.env.DATABASE_URL);
   const dbName = url.pathname.slice(1);
   url.pathname = '/postgres';
-  const admin = new pg.Client({ connectionString: url.toString() });
+  const { connectionConfig } = await import('../src/dbconfig.js');
+  const admin = new pg.Client(connectionConfig(url.toString()));
   await admin.connect();
   const exists = await admin.query('SELECT 1 FROM pg_database WHERE datname = $1', [dbName]);
   if (!exists.rowCount) await admin.query(`CREATE DATABASE "${dbName}"`);

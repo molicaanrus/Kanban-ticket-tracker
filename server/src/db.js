@@ -2,6 +2,7 @@ import pg from 'pg';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { connectionConfig } from './dbconfig.js';
 
 const MIGRATIONS_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../migrations');
 
@@ -9,7 +10,7 @@ const MIGRATIONS_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url))
 pg.types.setTypeParser(20, (v) => Number(v));
 
 export const pool = new pg.Pool({
-  connectionString: process.env.DATABASE_URL || 'postgres://tracker:tracker@localhost:5432/tracker',
+  ...connectionConfig(process.env.DATABASE_URL || 'postgres://tracker@localhost:5432/tracker'),
   max: 20,
 });
 

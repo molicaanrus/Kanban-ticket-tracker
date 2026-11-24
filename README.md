@@ -36,7 +36,7 @@ All settings are environment variables with working defaults. To override them c
 | `SMTP_USER`, `SMTP_PASS` | empty | SMTP login, if the server needs one |
 | `SMTP_FROM` | `Ticket Tracker <no-reply@ticket-tracker.local>` | Sender address |
 | `APP_BASE_URL` | empty (taken from the browser address) | Public URL used in verification links |
-| `POSTGRES_PASSWORD` | `tracker` | Password of the local database container |
+| `POSTGRES_PASSWORD` | empty | Password of the local database container. Empty means a random password is generated at first start and kept in the `secrets` Docker volume (nothing secret is committed). Upgrading from an older checkout? Run `docker compose down -v` once, so the database and its password are created together. |
 | `COOKIE_SECURE` | `false` | Set `true` when served over HTTPS |
 
 ### Using the DataArt SMTP relay
