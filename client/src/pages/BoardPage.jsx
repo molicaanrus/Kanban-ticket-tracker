@@ -4,14 +4,19 @@ import { Link, navigate, useApp } from '../app-state.jsx';
 import { EmptyState, TypeBadge } from '../components/ui.jsx';
 
 // The selected team lives in the URL (?team=ID), so a refresh or a shared link keeps the same board.
-const readTeamParam = () => new URLSearchParams(window.location.search).get('team') || '';
+// Filters are remembered per team while the app is open, so going to a ticket and back keeps the board as it was.
+const EMPTY_FILTERS = { q: '', type: '', epic: '' };
+const savedFilters = {};
+let lastTeamId = ''; // the board also reopens on the team you used last, when the link has no ?team=
+
+const readTeamParam = () => new URLSearchParams(window.location.search).get('team') || lastTeamId;
 
 export default function BoardPage() {
   const { teams, notify } = useApp();
   const [teamId, setTeamId] = useState(readTeamParam);
   const [tickets, setTickets] = useState(null); // null = loading
   const [epics, setEpics] = useState([]);
-  const [filters, setFilters] = useState({ q: '', type: '', epic: '' });
+  const [filters, setFilters] = useState(() => savedFilters[readTeamParam()] || EMPTY_FILTERS);
   const [dragId, setDragId] = useState(null);
   const [overState, setOverState] = useState(null);
   const [loadError, setLoadError] = useState('');
@@ -41,9 +46,16 @@ export default function BoardPage() {
 
   useEffect(() => {
     setTickets(null);
-    setFilters({ q: '', type: '', epic: '' });
+    setFilters(savedFilters[teamId] || EMPTY_FILTERS);
     load();
-  }, [load]);
+  }, [load, teamId]);
+
+  useEffect(() => {
+    if (teamId) {
+      savedFilters[teamId] = filters;
+      lastTeamId = teamId;
+    }
+  }, [teamId, filters]);
 
   const changeTeam = (id) => {
     setTeamId(id);
@@ -131,7 +143,7 @@ export default function BoardPage() {
                 {epics.map((e) => <option key={e.id} value={e.id}>{e.title}</option>)}
               </select>
             </label>
-            <button className="btn" disabled={!filtersActive} onClick={() => setFilters({ q: '', type: '', epic: '' })}>Clear</button>
+            <button className="btn" disabled={!filtersActive} onClick={() => setFilters(EMPTY_FILTERS)}>Clear</button>
             <div className="ticket-count" aria-live="polite">
               {tickets === null ? '' : filtersActive ? `${visible.length} of ${tickets.length} tickets` : `${tickets.length} tickets`}
             </div>
