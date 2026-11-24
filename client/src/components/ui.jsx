@@ -48,6 +48,14 @@ export function Confirm({ title, text, yesLabel = 'Delete', onYes, onClose }) {
 
 export const TypeBadge = ({ type }) => <span className={`type-badge type-${type}`}>{TYPE_LABEL[type]}</span>;
 
-export function EmptyState({ children }) {
-  return <div className="empty-state">{children}</div>;
+// Friendly empty state: optional symbol and title, a short explanation and one clear next action.
+export function EmptyState({ icon, title, children, action }) {
+  return (
+    <div className="empty-state">
+      {icon && <div className="empty-icon" aria-hidden="true">{icon}</div>}
+      {title && <h3 className="empty-title">{title}</h3>}
+      <p className="empty-text">{children}</p>
+      {action && <div className="empty-action">{action}</div>}
+    </div>
+  );
 }

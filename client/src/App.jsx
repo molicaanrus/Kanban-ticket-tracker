@@ -9,10 +9,16 @@ const PUBLIC_PATHS = ['/login', '/signup', '/verify-email'];
 export default function App() {
   const loc = useLocation();
   const [user, setUser] = useState(undefined); // undefined = checking, null = signed out
+  const [serverDown, setServerDown] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
-    api.get('/auth/me').then((d) => setUser(d.user)).catch(() => setUser(null));
-  }, []);
+    setServerDown(false);
+    api.get('/auth/me').then((d) => setUser(d.user)).catch((e) => {
+      if (e.code === 'NETWORK') setServerDown(true); // do not pretend the user is signed out
+      else setUser(null);
+    });
+  }, [attempt]);
 
   const onLoggedOut = useCallback(() => {
     setUser(null);
@@ -23,6 +29,17 @@ export default function App() {
     setUnauthenticatedHandler(onLoggedOut);
   }, [onLoggedOut]);
 
+  if (serverDown) {
+    return (
+      <div className="auth-page">
+        <div className="auth-card center">
+          <h2>Cannot reach the server</h2>
+          <p className="muted">Check your connection and try again.</p>
+          <button className="btn primary" onClick={() => setAttempt((n) => n + 1)}>Try again</button>
+        </div>
+      </div>
+    );
+  }
   if (user === undefined) return <div className="center-note">Loading…</div>;
 
   const isPublic = PUBLIC_PATHS.includes(loc.path);

@@ -120,7 +120,11 @@ export default function BoardPage() {
       </div>
 
       {noTeams ? (
-        <div className="card"><EmptyState>No teams yet. <Link to="/teams">Create a team</Link> to start tracking tickets.</EmptyState></div>
+        <div className="card">
+          <EmptyState icon="◎" title="No teams yet" action={<button className="btn accent" onClick={() => navigate('/teams')}>Create a team</button>}>
+            Create a team to start tracking tickets on the board.
+          </EmptyState>
+        </div>
       ) : (
         <>
           <div className="filters card">
@@ -152,7 +156,15 @@ export default function BoardPage() {
           {loadError && <div className="error-box" role="alert">{loadError} <button className="link-btn" onClick={load}>Retry</button></div>}
 
           {tickets === null ? (
-            <div className="center-note">Loading board…</div>
+            <div className="board" aria-busy="true" aria-label="Loading board">
+              {STATES.map((s) => (
+                <div key={s} className="column skeleton-col">
+                  <div className="skeleton skeleton-head" />
+                  <div className="skeleton skeleton-card" />
+                  <div className="skeleton skeleton-card short" />
+                </div>
+              ))}
+            </div>
           ) : (
             <>
               {tickets.length === 0 && !loadError && (

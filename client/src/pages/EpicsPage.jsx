@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { api, timeAgo } from '../api.js';
-import { useApp } from '../app-state.jsx';
+import { navigate, useApp } from '../app-state.jsx';
 import { Confirm, EmptyState } from '../components/ui.jsx';
 
 export default function EpicsPage() {
@@ -49,14 +49,18 @@ export default function EpicsPage() {
       </div>
 
       {teams && teams.length === 0 ? (
-        <div className="card"><EmptyState>Create a team first: every epic belongs to exactly one team.</EmptyState></div>
+        <div className="card"><EmptyState icon="◎" title="Create a team first" action={<button className="btn accent" onClick={() => navigate('/teams')}>Go to Teams</button>}>
+          Every epic belongs to exactly one team.
+        </EmptyState></div>
       ) : (
         <div className="two-col">
           <div className="card">
             {epics === null ? (
               <div className="center-note">Loading epics…</div>
             ) : epics.length === 0 ? (
-              <EmptyState>No epics in this team yet.</EmptyState>
+              <EmptyState icon="◇" title="No epics yet" action={<button className="btn accent" onClick={() => setForm({})}>+ Create epic</button>}>
+                Epics group related tickets. Create the first one for this team.
+              </EmptyState>
             ) : (
               <table className="table">
                 <thead><tr><th>Title</th><th className="num">Tickets</th><th>Modified</th><th className="actions">Actions</th></tr></thead>

@@ -61,7 +61,9 @@ export default function TeamsPage() {
         {teams === null ? (
           <div className="center-note">Loading teams…</div>
         ) : teams.length === 0 ? (
-          <EmptyState>No teams yet. Create the first team to start adding tickets.</EmptyState>
+          <EmptyState icon="◎" title="No teams yet" action={<button className="btn accent" onClick={() => setForm({})}>+ Create team</button>}>
+            A team owns its epics and tickets. Create the first one to get started.
+          </EmptyState>
         ) : (
           <table className="table">
             <thead>
