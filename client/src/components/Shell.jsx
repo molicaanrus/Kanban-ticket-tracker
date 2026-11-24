@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { api } from '../api.js';
 import { Link, navigate, useApp } from '../app-state.jsx';
 import { useTheme } from '../theme.jsx';
@@ -6,6 +6,41 @@ import BoardPage from '../pages/BoardPage.jsx';
 import TicketPage from '../pages/TicketPage.jsx';
 import TeamsPage from '../pages/TeamsPage.jsx';
 import EpicsPage from '../pages/EpicsPage.jsx';
+
+const NAV = [['board', '/', 'Board'], ['teams', '/teams', 'Teams'], ['epics', '/epics', 'Epics']];
+
+// Segmented menu: the dark "thumb" slides under the active link.
+function NavSlider({ section }) {
+  const navRef = useRef(null);
+  const [thumb, setThumb] = useState(null);
+  const [ready, setReady] = useState(false);
+
+  useLayoutEffect(() => {
+    const place = () => {
+      const el = navRef.current?.querySelector('.navlink.active');
+      if (el) setThumb({ left: el.offsetLeft, width: el.offsetWidth });
+    };
+    place();
+    window.addEventListener('resize', place);
+    document.fonts?.ready.then(place);
+    return () => window.removeEventListener('resize', place);
+  }, [section]);
+
+  // animate only after the first placement, so the thumb does not fly in on page load
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setReady(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+
+  return (
+    <nav ref={navRef} className={ready ? 'nav-ready' : ''}>
+      {thumb && <span className="nav-thumb" style={{ transform: `translateX(${thumb.left}px)`, width: thumb.width }} aria-hidden="true" />}
+      {NAV.map(([key, to, label]) => (
+        <Link key={key} to={to} className={`navlink ${section === key ? 'active' : ''}`}>{label}</Link>
+      ))}
+    </nav>
+  );
+}
 
 export default function Shell({ loc }) {
   const { user, onLoggedOut, toast } = useApp();
@@ -39,11 +74,7 @@ export default function Shell({ loc }) {
     <div className="app">
       <header className="topbar">
         <Link to="/" className="brand">TICKET TRACKER</Link>
-        <nav>
-          <Link to="/" className={`navlink ${section === 'board' ? 'active' : ''}`}>Board</Link>
-          <Link to="/teams" className={`navlink ${section === 'teams' ? 'active' : ''}`}>Teams</Link>
-          <Link to="/epics" className={`navlink ${section === 'epics' ? 'active' : ''}`}>Epics</Link>
-        </nav>
+        <NavSlider section={section} />
         <div className="user-menu" ref={menuRef}>
           <button className="user-btn" onClick={() => setMenu((m) => !m)} aria-haspopup="menu" aria-expanded={menu}>
             {user.email} ▾
