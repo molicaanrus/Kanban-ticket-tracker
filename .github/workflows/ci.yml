@@ -1,0 +1,26 @@
+name: CI
+on: [push, workflow_dispatch]
+jobs:
+  compose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start the stack
+        run: docker compose up --build -d
+      - name: Wait for health
+        run: |
+          for i in $(seq 1 40); do
+            curl -fs http://localhost:8080/api/health && exit 0
+            sleep 3
+          done
+          docker compose logs; exit 1
+      - name: Smoke test, sign-up and verification email
+        run: |
+          curl -fs -X POST localhost:8080/api/auth/signup -H 'Content-Type: application/json' -d '{"email":"ci@example.com","password":"password123"}'
+          sleep 2
+          curl -fs localhost:8025/api/v1/messages | grep -q "ci@example.com"
+      - name: Automated tests
+        run: docker compose --profile test run --rm tests
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs
