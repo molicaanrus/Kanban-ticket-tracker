@@ -82,7 +82,7 @@ h3 { margin: 0 0 12px; font-size: 16px; }
 .navlink { padding: 8px 16px; border-radius: 999px; color: var(--muted); text-decoration: none; font-weight: 600; }
 .navlink:hover { color: var(--text); }
 .navlink.active { background: var(--dark); color: #fff; }
-.topbar .user-menu { margin-left: auto; }
+.topbar .topbar-right { margin-left: auto; display: flex; align-items: center; gap: var(--space-3); }
 .user-menu { position: relative; }
 .user-btn { background: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.9); border-radius: 999px; color: var(--text); padding: var(--space-3) var(--space-4); font-weight: 600; }
 .menu { position: absolute; right: 0; top: 46px; background: #fff; border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: 0 16px 40px rgba(20,20,30,.16); min-width: 170px; z-index: 20; overflow: hidden; }
@@ -282,7 +282,7 @@ html[data-theme="dark"] .card-ticket:active { box-shadow: 0 1px 2px rgba(0,0,0,.
   .topbar { display: grid; grid-template-columns: 1fr auto; gap: var(--space-3); padding: var(--space-3) var(--space-4); }
   .topbar nav { grid-column: 1 / -1; grid-row: 2; margin-left: 0; width: 100%; }
   .topbar nav .navlink { flex: 1; text-align: center; }
-  .topbar .user-menu { grid-column: 2; grid-row: 1; }
+  .topbar .topbar-right { grid-column: 2; grid-row: 1; }
   .user-btn { max-width: 168px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: var(--space-2) var(--space-3); }
   .menu { right: 0; }
   .brand { font-size: 17px; }
@@ -381,3 +381,25 @@ html[data-theme="dark"] .board-head .field.limit-field input { background-color:
   .board-head-left { flex: 1; min-width: 0; }
   .board-head .field.limit-field { width: 120px; flex: 0 0 120px; }
 }
+
+/* The logo is not a link or a button: no hover or pointer behaviour */
+.brand { cursor: default; user-select: none; }
+.brand:hover { color: var(--text); }
+
+/* Theme switch in the header: a pill with a sun and a moon, the thumb slides to the active one */
+.theme-switch { position: relative; width: 64px; height: 38px; flex: 0 0 auto; border-radius: 999px; padding: 0; cursor: pointer;
+  background: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.9); color: var(--muted); display: block; transition: background .12s, border-color .12s, transform .06s; }
+.theme-switch:hover { border-color: var(--border-strong); background: #fff; }
+.theme-switch:active { transform: scale(.97); }
+.theme-thumb { position: absolute; top: 3px; left: 3px; width: 30px; height: 30px; border-radius: 50%; background: var(--text); transition: transform .22s cubic-bezier(.4,.1,.2,1); }
+.theme-switch.is-dark .theme-thumb { transform: translateX(26px); }
+.ts-icon { position: absolute; top: 50%; width: 16px; height: 16px; margin-top: -8px; transition: color .15s; }
+.ts-sun { left: 10px; color: #fff; }
+.ts-moon { right: 10px; }
+.theme-switch.is-dark .ts-sun { color: var(--muted); }
+.theme-switch.is-dark .ts-moon { color: var(--bg2); }
+html[data-theme="dark"] .theme-switch { background: var(--panel-soft); border-color: var(--border); }
+html[data-theme="dark"] .theme-switch:hover { background: #272b36; border-color: var(--border-strong); }
+html[data-theme="dark"] .theme-thumb { background: var(--accent); }
+html[data-theme="dark"] .theme-switch.is-dark .ts-moon { color: #fff; }
+@media (prefers-reduced-motion: reduce) { .theme-thumb { transition: none; } }

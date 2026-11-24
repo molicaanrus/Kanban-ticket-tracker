@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { api } from '../api.js';
 import { Link, navigate, useApp } from '../app-state.jsx';
-import { useTheme } from '../theme.jsx';
+import { ThemeSwitch } from '../theme.jsx';
 import BoardPage from '../pages/BoardPage.jsx';
 import TicketPage from '../pages/TicketPage.jsx';
 import TeamsPage from '../pages/TeamsPage.jsx';
@@ -46,7 +46,6 @@ export default function Shell({ loc }) {
   const { user, onLoggedOut, toast } = useApp();
   const [menu, setMenu] = useState(false);
   const menuRef = useRef(null);
-  const { theme, toggle } = useTheme();
 
   useEffect(() => {
     const close = (e) => menuRef.current && !menuRef.current.contains(e.target) && setMenu(false);
@@ -73,18 +72,20 @@ export default function Shell({ loc }) {
   return (
     <div className="app">
       <header className="topbar">
-        <Link to="/" className="brand">TICKET TRACKER</Link>
+        <span className="brand">TICKET TRACKER</span>
         <NavSlider section={section} />
+        <div className="topbar-right">
+        <ThemeSwitch />
         <div className="user-menu" ref={menuRef}>
           <button className="user-btn" onClick={() => setMenu((m) => !m)} aria-haspopup="menu" aria-expanded={menu}>
             {user.email} ▾
           </button>
           {menu && (
             <div className="menu" role="menu">
-              <button role="menuitem" onClick={toggle}>{theme === 'dark' ? '☀ Light theme' : '☾ Dark theme'}</button>
               <button role="menuitem" onClick={logout}>Log out</button>
             </div>
           )}
+        </div>
         </div>
       </header>
       <main className="content">
