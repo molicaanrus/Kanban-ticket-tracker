@@ -1,0 +1,12 @@
+{
+  "name": "Ticket Tracker (Docker in Docker)",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "forwardPorts": [8080, 8025],
+  "portsAttributes": {
+    "8080": { "label": "Ticket Tracker", "onAutoForward": "openBrowser" },
+    "8025": { "label": "Mailpit (verification emails)" }
+  }
+}

@@ -1,0 +1,61 @@
+# Start everything with:  docker compose up --build
+# Then open http://localhost:8080  (verification emails: http://localhost:8025)
+services:
+  # Persistence tier: PostgreSQL (database port is not published to the host)
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: tracker
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tracker}
+      POSTGRES_DB: tracker
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tracker -d tracker"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  # Local mail catcher so sign-up works out of the box. Open http://localhost:8025 to read the messages.
+  # To use a real SMTP relay instead (for example relay1.dataart.com), set SMTP_HOST in a .env file; see .env.example.
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "8025:8025"
+    restart: unless-stopped
+
+  # Application tier: HTTP API + compiled SPA
+  app:
+    build: .
+    ports:
+      - "8080:3000"
+    environment:
+      DATABASE_URL: postgres://tracker:${POSTGRES_PASSWORD:-tracker}@db:5432/tracker
+      APP_BASE_URL: ${APP_BASE_URL:-http://localhost:8080}
+      SMTP_HOST: ${SMTP_HOST:-mailpit}
+      SMTP_PORT: ${SMTP_PORT:-1025}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-Ticket Tracker <no-reply@ticket-tracker.local>}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Automated tests (backend business flows + API flows). Run with:
+  #   docker compose --profile test run --rm tests
+  tests:
+    build: .
+    profiles: ["test"]
+    command: ["npm", "test"]
+    user: node
+    environment:
+      TEST_DATABASE_URL: postgres://tracker:${POSTGRES_PASSWORD:-tracker}@db:5432/tracker_test
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
