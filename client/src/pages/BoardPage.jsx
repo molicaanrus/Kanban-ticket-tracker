@@ -9,10 +9,10 @@ const EMPTY_FILTERS = { q: '', type: '', epic: '' };
 const savedFilters = {};
 let lastTeamId = ''; // the board also reopens on the team you used last, when the link has no ?team=
 
-// WIP limit: the working columns hold at most this many tickets (New and Done are not limited).
+// WIP limit: the working columns hold at most this many tickets (only Done is not limited).
 // It is enforced on the board only: a drag into a full column is refused and the card stays where it was.
 const WIP_LIMIT = 2;
-const WIP_STATES = ['ready_for_implementation', 'in_progress', 'ready_for_acceptance'];
+const WIP_STATES = ['new', 'ready_for_implementation', 'in_progress', 'ready_for_acceptance'];
 
 const readTeamParam = () => new URLSearchParams(window.location.search).get('team') || lastTeamId;
 
