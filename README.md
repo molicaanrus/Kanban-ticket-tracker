@@ -35,7 +35,7 @@ All settings are environment variables with working defaults. To override them c
 | `SMTP_SECURE` | `false` | `true` for implicit TLS (port 465) |
 | `SMTP_USER`, `SMTP_PASS` | empty | SMTP login, if the server needs one |
 | `SMTP_FROM` | `Ticket Tracker <no-reply@ticket-tracker.local>` | Sender address |
-| `APP_BASE_URL` | `http://localhost:8080` | Public URL used in verification links |
+| `APP_BASE_URL` | empty (taken from the browser address) | Public URL used in verification links |
 | `POSTGRES_PASSWORD` | `tracker` | Password of the local database container |
 | `COOKIE_SECURE` | `false` | Set `true` when served over HTTPS |
 
