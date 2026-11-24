@@ -193,7 +193,7 @@ export default function BoardPage() {
                     role="listitem"
                     aria-label={STATE_LABEL[state]}
                     data-state={state}
-                    className={`column ${overState === state ? 'over' : ''} ${dragId !== null ? 'can-drop' : ''} ${WIP_STATES.includes(state) && totals[state] >= WIP_LIMIT ? 'is-full' : ''}`}
+                    className={`column ${overState === state ? 'over' : ''} ${byState[state].length > 0 ? 'filled' : ''} ${dragId !== null ? 'can-drop' : ''} ${WIP_STATES.includes(state) && totals[state] >= WIP_LIMIT ? 'is-full' : ''}`}
                     onDragOver={(e) => {
                       if (dragId === null) return;
                       e.preventDefault();
