@@ -71,10 +71,7 @@ export default function BoardPage() {
   const filtersActive = filters.q || filters.type || filters.epic;
 
   // ---- drag and drop: optimistic move, persisted at once, rolled back on failure ----
-  const drop = async (state) => {
-    const id = dragId;
-    setDragId(null);
-    setOverState(null);
+  const move = async (id, state) => {
     const ticket = tickets.find((t) => t.id === id);
     if (!ticket || ticket.state === state) return;
     const previous = tickets;
@@ -87,6 +84,13 @@ export default function BoardPage() {
       setTickets(previous); // card returns to its previous column
       notify(`Could not move "${ticket.title}": ${e.message}`, 'error');
     }
+  };
+
+  const drop = (state) => {
+    const id = dragId;
+    setDragId(null);
+    setOverState(null);
+    if (id !== null) move(id, state);
   };
 
   const noTeams = teams && teams.length === 0;
@@ -149,7 +153,7 @@ export default function BoardPage() {
                     role="listitem"
                     aria-label={STATE_LABEL[state]}
                     data-state={state}
-                    className={`column ${overState === state ? 'over' : ''}`}
+                    className={`column ${overState === state ? 'over' : ''} ${dragId !== null ? 'can-drop' : ''}`}
                     onDragOver={(e) => {
                       if (dragId === null) return;
                       e.preventDefault();
@@ -170,11 +174,11 @@ export default function BoardPage() {
                     </div>
                     <div className="column-body">
                       {byState[state].map((t) => (
-                        <Card key={t.id} t={t} dragging={dragId === t.id}
+                        <Card key={t.id} t={t} dragging={dragId === t.id} onMove={(st) => move(t.id, st)}
                           onDragStart={() => setDragId(t.id)}
                           onDragEnd={() => { setDragId(null); setOverState(null); }} />
                       ))}
-                      {byState[state].length === 0 && <div className="column-empty">{filtersActive ? 'No matching tickets' : 'No tickets'}</div>}
+                      {byState[state].length === 0 && <div className="column-empty">{filtersActive ? 'No matching tickets' : 'Drop a ticket here'}</div>}
                     </div>
                   </section>
                 ))}
@@ -187,7 +191,7 @@ export default function BoardPage() {
   );
 }
 
-function Card({ t, dragging, onDragStart, onDragEnd }) {
+function Card({ t, dragging, onMove, onDragStart, onDragEnd }) {
   return (
     <article
       className={`card-ticket ${dragging ? 'dragging' : ''}`}
@@ -206,6 +210,10 @@ function Card({ t, dragging, onDragStart, onDragEnd }) {
         <span className="muted epic">{t.epicTitle ? `Epic: ${t.epicTitle}` : ''}</span>
         <span className="muted" title={t.modifiedAt}>{timeAgo(t.modifiedAt)}</span>
       </div>
+      <select className="move-select" value={t.state} aria-label={`Move "${t.title}" to another column`}
+        onChange={(e) => onMove(e.target.value)} draggable={false}>
+        {STATES.map((st) => <option key={st} value={st}>{st === t.state ? `Status: ${STATE_LABEL[st]}` : `Move to: ${STATE_LABEL[st]}`}</option>)}
+      </select>
     </article>
   );
 }
