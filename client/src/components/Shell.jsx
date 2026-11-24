@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { api } from '../api.js';
 import { Link, navigate, useApp } from '../app-state.jsx';
+import { useTheme } from '../theme.jsx';
 import BoardPage from '../pages/BoardPage.jsx';
 import TicketPage from '../pages/TicketPage.jsx';
 import TeamsPage from '../pages/TeamsPage.jsx';
@@ -10,6 +11,7 @@ export default function Shell({ loc }) {
   const { user, onLoggedOut, toast } = useApp();
   const [menu, setMenu] = useState(false);
   const menuRef = useRef(null);
+  const { theme, toggle } = useTheme();
 
   useEffect(() => {
     const close = (e) => menuRef.current && !menuRef.current.contains(e.target) && setMenu(false);
@@ -48,6 +50,7 @@ export default function Shell({ loc }) {
           </button>
           {menu && (
             <div className="menu" role="menu">
+              <button role="menuitem" onClick={toggle}>{theme === 'dark' ? '☀ Light theme' : '☾ Dark theme'}</button>
               <button role="menuitem" onClick={logout}>Log out</button>
             </div>
           )}

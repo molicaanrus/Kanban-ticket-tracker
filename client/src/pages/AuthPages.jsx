@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { api } from '../api.js';
 import { Link, navigate } from '../app-state.jsx';
+import { ThemeToggle } from '../theme.jsx';
 
 export function AuthLayout({ children }) {
   return (
     <div className="auth-page">
+      <div className="auth-theme"><ThemeToggle /></div>
       <h1 className="brand-big">TICKET TRACKER</h1>
       <div className="auth-card">{children}</div>
     </div>
