@@ -100,7 +100,7 @@ export default function BoardPage() {
             {teams?.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
           </select>
         </label>
-        <button className="btn dark" disabled={!teamId} onClick={() => navigate(`/tickets/new?team=${teamId}`)}>+ New ticket</button>
+        <button className="btn accent" disabled={!teamId} onClick={() => navigate(`/tickets/new?team=${teamId}`)}>+ New ticket</button>
       </div>
 
       {noTeams ? (
