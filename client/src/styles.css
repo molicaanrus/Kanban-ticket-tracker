@@ -403,3 +403,7 @@ html[data-theme="dark"] .theme-switch:hover { background: #272b36; border-color:
 html[data-theme="dark"] .theme-thumb { background: var(--accent); }
 html[data-theme="dark"] .theme-switch.is-dark .ts-moon { color: #fff; }
 @media (prefers-reduced-motion: reduce) { .theme-thumb { transition: none; } }
+
+/* The "no tickets yet" hint is information, not an error: neutral colours */
+.hint-banner { background: rgba(255,255,255,.7); border: 1px solid var(--border); color: var(--muted); }
+html[data-theme="dark"] .hint-banner { background: var(--panel-soft); border-color: var(--border); color: var(--muted); }
